@@ -12,10 +12,10 @@ NodeIMU::NodeIMU() {
     if ((imu == NULL) || (imu->IMUType() == RTIMU_TYPE_NULL)) {
         printf("No IMU found\n");
         exit(1);
-    }	
+    }
 	
     imu->IMUInit();
-	if (pressure != NULL) { pressure->pressureInit(); }	
+	if (pressure != NULL) { pressure->pressureInit(); }
 	if (humidity != NULL) { humidity->humidityInit(); }
 
     imu->setSlerpPower((float)0.02);
@@ -47,8 +47,8 @@ void AddRTVector3ToResult(v8::Handle<v8::Object>& result, RTVector3 data, const 
 
 	Nan::Set(result, Nan::New(name).ToLocalChecked(), field);
 }
-
-void PutMeasurement(const RTIMU_DATA& imuData, const bool pressure, const bool humidity, v8::Handle<v8::Object>& result) {
+imuData, pressure, pressureData, humidity, humidityData, result
+void PutMeasurement(const RTIMU_DATA& imuData, const bool pressure, const RTIMU_DATA& pressureData, const bool humidity, const RTIMU_DATA& humidityData, v8::Handle<v8::Object>& result) {
 	Nan::HandleScope();
 	
 	Nan::Set(result, Nan::New("timestamp").ToLocalChecked(), Nan::New<v8::Date>(0.001 * (double)imuData.timestamp).ToLocalChecked());
@@ -61,11 +61,16 @@ void PutMeasurement(const RTIMU_DATA& imuData, const bool pressure, const bool h
 	Nan::Set(result, Nan::New("tiltHeading").ToLocalChecked(), Nan::New(RTMath::poseFromAccelMag(imuData.accel, imuData.compass).z()));
 
 	if (pressure) {
-		Nan::Set(result, Nan::New("pressure").ToLocalChecked(), Nan::New(imuData.pressure));
-		Nan::Set(result, Nan::New("temperature").ToLocalChecked(), Nan::New(imuData.temperature));
+		Nan::Set(result, Nan::New("pressure").ToLocalChecked(), Nan::New(pressureData.pressure));
+		Nan::Set(result, Nan::New("pressureValid").ToLocalChecked(), Nan::New(pressureData.pressureValid));
+		Nan::Set(result, Nan::New("pressureTemperature").ToLocalChecked(), Nan::New(pressureData.temperature));
+		Nan::Set(result, Nan::New("pressureTemperatureValid").ToLocalChecked(), Nan::New(pressureData.temperatureValid));
 	}
 	if (humidity) {
-		Nan::Set(result, Nan::New("humidity").ToLocalChecked(), Nan::New(imuData.humidity));
+		Nan::Set(result, Nan::New("humidity").ToLocalChecked(), Nan::New(humidityData.humidity));
+		Nan::Set(result, Nan::New("humidityValid").ToLocalChecked(), Nan::New(humidityData.humidityValid));
+		Nan::Set(result, Nan::New("humidityTemperature").ToLocalChecked(), Nan::New(humidityData.temperature));
+		Nan::Set(result, Nan::New("humidityTemperatureValid").ToLocalChecked(), Nan::New(humidityData.temperatureValid));
 	}
 }
 
@@ -121,13 +126,15 @@ NAN_METHOD(NodeIMU::GetValueSync) {
 	NodeIMU* obj = Nan::ObjectWrap::Unwrap<NodeIMU>(info.This());
 	if (obj->imu->IMURead()) {
 		RTIMU_DATA imuData = obj->imu->getIMUData();
+		RTIMU_DATA pressureData;
+		RTIMU_DATA humidityData;
 		bool pressure = (obj->pressure != NULL);
 		bool humidity = (obj->humidity != NULL);
-		if (pressure) { obj->pressure->pressureRead(imuData); }
-		if (humidity) { obj->humidity->humidityRead(imuData); }
+		if (pressure) { obj->pressure->pressureRead(pressureData); }
+		if (humidity) { obj->humidity->humidityRead(humidityData); }
 
 		v8::Local<v8::Object> result = Nan::New<v8::Object>();
-		PutMeasurement(imuData, pressure, humidity, result);
+		PutMeasurement(imuData, pressure, pressureData, humidity, humidityData, result);
 
 		info.GetReturnValue().Set(result);
 	}
