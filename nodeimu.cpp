@@ -47,7 +47,7 @@ void AddRTVector3ToResult(v8::Handle<v8::Object>& result, RTVector3 data, const 
 
 	Nan::Set(result, Nan::New(name).ToLocalChecked(), field);
 }
-imuData, pressure, pressureData, humidity, humidityData, result
+
 void PutMeasurement(const RTIMU_DATA& imuData, const bool pressure, const RTIMU_DATA& pressureData, const bool humidity, const RTIMU_DATA& humidityData, v8::Handle<v8::Object>& result) {
 	Nan::HandleScope();
 	
