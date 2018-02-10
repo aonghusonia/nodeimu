@@ -20,16 +20,14 @@ function dispAccel() {
   var toc = new Date();
 
   var str = data.timestamp.toISOString() + " ";
-  str += print_vector3("Accel", data.accel)
-  // str += print_vector3("Gyro", data.gyro)
-  // str += print_vector3("Compass", data.compass)
-  // str += print_vector3("Fusion", data.fusionPose)
+  str += print_vector3("Accel", data.accel);
+  str += print_vector3("Gyro", data.gyro);
+  str += print_vector3("Compass", data.compass);
+  str += print_vector3("Fusion", data.fusionPose);
+  console.log(str);
+  
+  console.log(data);
 
-  var str2 = "";
-  if (data.temperature && data.pressure && data.humidity) {
-    var str2 = util.format(' %s %s %s', data.temperature.toFixed(4), data.pressure.toFixed(4), data.humidity.toFixed(4));
-  }
-  console.log(str + str2);
   num++;
   if (num == numStop) {
     console.timeEnd("sync");
