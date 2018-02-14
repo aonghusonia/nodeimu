@@ -18,6 +18,7 @@ class NodeIMU : public Nan::ObjectWrap {
 
 		 Nan::SetPrototypeMethod(tpl, "getValue", GetValue);
 		 Nan::SetPrototypeMethod(tpl, "getValueSync", GetValueSync);
+		 Nan::SetPrototypeMethod(tpl, "setImuConfig", SetImuConfig);
 
 		 Nan::Set(target, Nan::New("IMU").ToLocalChecked(),
 			 Nan::GetFunction(tpl).ToLocalChecked());
@@ -34,6 +35,8 @@ class NodeIMU : public Nan::ObjectWrap {
   static NAN_METHOD(GetValue);
 
   static NAN_METHOD(GetValueSync);
+  
+  static NAN_METHOD(SetImuConfig);
 
   RTIMU *imu;
   RTIMUSettings *settings;

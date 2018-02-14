@@ -139,3 +139,26 @@ NAN_METHOD(NodeIMU::GetValueSync) {
 		info.GetReturnValue().Set(result);
 	}
 }
+
+
+NAN_METHOD(NodeIMU::SetImuConfig) {
+	NodeIMU* obj = Nan::ObjectWrap::Unwrap<NodeIMU>(info.This());
+
+	if (info.Length() < 3) {
+        Nan::ThrowTypeError("Wrong number of arguments");
+        return;
+	}
+
+    if (!info[0]->IsBoolean() || !info[1]->IsBoolean() || !info[2]->IsBoolean()) {
+	    Nan::ThrowTypeError("Arguments should be boolean");
+	    return;
+    }
+
+	bool compassEnabled = info[0]->BooleanValue();
+	bool gyroEnabled = info[1]->BooleanValue();
+	bool accelEnabled = info[2]->BooleanValue();
+  
+	obj->imu->setGyroEnable(compassEnabled);
+    obj->imu->setAccelEnable(gyroEnabled);
+    obj->imu->setCompassEnable(accelEnabled);
+}
